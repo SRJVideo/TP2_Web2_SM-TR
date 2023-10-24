@@ -58,7 +58,7 @@ conn.connect(err => {
         console.log("Table Evenements créée 👍");
     })
 
-    // Endpoint GET pour obtenir tous les événements
+    //  GET pour obtenir tous les événements
     app.get('/events', (req, res) => {
         const query = 'SELECT * FROM evenements';
         conn.query(query, (err, results) => {
@@ -71,8 +71,8 @@ conn.connect(err => {
         });
     });
 
-    // Endpoint POST pour ajouter un nouvel événement
-    app.post('/events', (req, res) => {
+    //  POST pour ajouter un nouvel événement
+    app.post('/addEvents', (req, res) => {
         const query = "INSERT INTO evenements (Titre, Date_event) VALUES ('"+req.query.titre+"', STR_TO_DATE('"+req.query.date+"', '%d/%m/%Y'))";
         conn.query(query, (err, result) => {
             if (err) {
@@ -84,8 +84,8 @@ conn.connect(err => {
         });
     });
 
-    // Endpoint DELETE pour supprimer un événement par son ID
-    app.delete('/events/:id', (req, res) => {
+    //  DELETE pour supprimer un événement par son ID
+    app.delete('/deleteEvents/:id', (req, res) => {
         const eventId = req.params.id;
         const query = 'DELETE FROM evenements WHERE id = ?';
         conn.query(query, [eventId], (err, result) => {
