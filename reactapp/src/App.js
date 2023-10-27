@@ -1,8 +1,11 @@
-import logo from './logo.svg';
-import './App.css';
 import {BrowserRouter, Route, Routes} from "react-router-dom";
 import Navbar from "./components/Navbar";
 import {Container} from "react-bootstrap";
+import Accueil from "./components/Accueil";
+import Inscrire from "./components/Inscrire";
+import Connecter from "./components/Connecter";
+import 'bootstrap/dist/css/bootstrap.css';
+import 'bootstrap/dist/js/bootstrap.js';
 
 function App() {
   return (
@@ -11,9 +14,9 @@ function App() {
             <Navbar/>
             <Container className='navBar'>
                 <Routes>
-                    <Route to="/"/>
-                    <Route to="/inscrit"/>
-                    <Route path="/connect"/>
+                    <Route exact path="/inscrire" element={<Inscrire/>}/>
+                    <Route exact path="/connecter" element={<Connecter/>} />
+                    <Route exact path="/" element={<Accueil/>}/>
                 </Routes>
             </Container>
         </BrowserRouter>
