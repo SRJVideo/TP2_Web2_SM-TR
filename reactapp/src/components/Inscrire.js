@@ -1,69 +1,89 @@
-import React, {useState} from 'react';
 import {NavLink} from "react-router-dom";
 import Form from "react-bootstrap/Form";
-import {Button} from "react-bootstrap";
+import {Button, Col} from "react-bootstrap";
+import * as formik from "formik";
+import * as yup from "yup";
 
 function Inscrire() {
-   // https://react-bootstrap.github.io/docs/forms/validation/
-        const [validated, setValidated] = useState(false);
-        const [username, setUsername] = useState("");
-        const [password, setPassword] = useState("");
-        const [response,setResponse] = useState("");
-        const handleSubmit = (event) => {
-            const form = event.currentTarget;
-            if (form.checkValidity() === false) {
-                event.preventDefault();
-                event.stopPropagation();
-                console.log("Tout est null");
-            }
-            console.log(username+" : "+password);
+    // https://react-bootstrap.github.io/docs/forms/validation/
+    const {Formik} = formik;
 
-            procederInscription();
-        };
+    const schema = yup.object().shape({
+        username: yup.string().required(),
+        password: yup.string().required(),
+    });
 
-        const procederInscription = () => {
-            setValidated(true);
-            fetch("http://localhost:8081/addUser", {
-                method: 'POST',
-                headers: {'Content-type': 'application/json'},
-                body: JSON.stringify({nom: username, motdepasse: password})
-            }).then( res => res.json())
-                .then(succ => setResponse(succ))
-                .catch(error => console.log(error));
-        }
+    const procederInscription = (formik) => {
+        console.log(formik.username)
+        console.log(formik.password)
 
-        return (
-            <div>
-                <h1>S'inscrire</h1>
-                <p>Créer un nouvel utilisateur</p>
+        fetch("http://localhost:8081/addUser", {
+            method: 'POST',
+            headers: {'Content-type': 'application/json'},
+            body: JSON.stringify({nom: formik.username, motdepasse: formik.password})
+        }).then(res => res.json())
+            .then(succ => console.log(succ))
+            .catch(error => console.log(error));
+
+    };
 
 
-                <Form noValidate validated={validated} onSubmit={handleSubmit}>
-                    <Form.Group className="mb-3">
-                        <Form.Label htmlFor="username">Nom d'utilisateur</Form.Label>
-                        <Form.Control name="username"  type="text" isInvalid={username.length < 1} onChange={e => setUsername(e.target.value)} required></Form.Control>
-                        <Form.Control.Feedback type="invalid">Veuillez entrez au moins un caractère alphanumérique</Form.Control.Feedback>
-                    </Form.Group>
-                    <Form.Group className="mb-3">
-                        <Form.Label htmlFor="password">Mot de passe</Form.Label>
-                        <Form.Control name="password" type="password" isInvalid={password.length < 4} onChange={e => setPassword(e.target.value)} required></Form.Control>
-                        <Form.Control.Feedback type="invalid">Votre mot de passe doit contenir au moins 4 caractères</Form.Control.Feedback>
-                    </Form.Group>
-                    <Form.Group className="mb-3">
-                        <Form.Text>
-                            Si votre compte existe déjà,&nbsp;
-                            <NavLink to="/connecter">Connectez-vous</NavLink>
-                            &nbsp;ici
-                        </Form.Text>
-                    </Form.Group>
+    return (
+        <div>
+            <h1>S'inscrire</h1>
+            <p>Créer un nouvel utilisateur</p>
 
-                    <Button variant="primary" type="submit">
-                        Continuer
-                    </Button>
-                </Form>
-                <div>{response}</div>
-            </div>
-        );
+
+            <Formik
+                validationSchema={schema}
+                onSubmit={procederInscription}
+                initialValues={{
+                    username: '',
+                    password: '',
+                }}
+            >
+                {({handleSubmit, handleChange, values, touched, errors}) => (
+                    <Form noValidate onSubmit={handleSubmit}>
+                        <Form.Group as={Col} className="mb-3" >
+                            <Form.Label htmlFor="username">Nom d'utilisateur</Form.Label>
+                            <Form.Control name="username"
+                                          type="text"
+                                          value={values.username}
+                                          onChange={handleChange}
+                                          isValid={touched.username && !errors.username}
+                                          required></Form.Control>
+                        </Form.Group>
+
+                        <Form.Group className="mb-3" >
+                            <Form.Label htmlFor="password">Mot de passe</Form.Label>
+                            <Form.Control name="password"
+                                          type="password"
+                                          value={values.password}
+                                          onChange={handleChange}
+                                          isValid={touched.password && !errors.password}
+                                          isInvalid={values.password.length < 4}
+                                          required></Form.Control>
+                        </Form.Group>
+
+                        <Form.Group className="mb-3">
+                            <Form.Text>
+                                Si votre compte existe déjà,&nbsp;
+                                <NavLink to="/connecter">Connectez-vous</NavLink>
+                                &nbsp;ici
+                            </Form.Text>
+                        </Form.Group>
+
+                        <Button variant="primary" type="submit">
+                            Continuer
+                        </Button>
+                    </Form>
+                )}
+
+            </Formik>
+
+
+        </div>
+    );
 }
 
 export default Inscrire;

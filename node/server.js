@@ -14,19 +14,19 @@ let conn = mysql.createConnection(connString);
 const app = express();
 app.use(express.json());
 app.use(cors({
-    origin:["http://localhost:8081"],
-    methods:["GET","POST","DELETE"],
+    origin: ["http://localhost:3000"],
+    methods: ["GET", "POST", "DELETE"],
     credentials: true,
 }));
 app.use(cookieParser());
-app.use(bodyParser.urlencoded({extended:true}));
+app.use(bodyParser.urlencoded({extended: true}));
 app.use(session({
     key: "userID",
     secret: "secret du groupe !",
     // https://stackoverflow.com/questions/40381401/when-to-use-saveuninitialized-and-resave-in-express-session
-    resave:false,
+    resave: false,
     saveUninitialized: false,
-    cookie:{expires: 60*60*24}
+    cookie: {expires: 60 * 60 * 24}
 }));
 app.use((req, res, next) => {
     res.header("Access-Control-Allow-Origin", "*");
@@ -54,7 +54,6 @@ conn.connect(err => {
         console.log("Table Utilisateurs détruite ❌");
     })
 
-
     //CREATE TABLE
     sql = "CREATE TABLE utilisateurs" +
         " (Id INT not null AUTO_INCREMENT, " +
@@ -79,80 +78,74 @@ conn.connect(err => {
     })
 
 
-// POST un nouvel utilisateur
+    // POST un nouvel utilisateur
     app.post('/addUser', (req, res) => {
-        const nom = req.query.nom;
-        const motdepasse = req.query.motdepasse;
-        console.log("Ajout d'utilisateur")
+        const event = req.body;
+
 
         const query = "INSERT INTO utilisateurs (Full_Name, Mot_De_Passe) VALUES (?,?);";
-        bcrypt.hash(motdepasse, saltRounds, (er, hash) => {
+        bcrypt.hash(event.motdepasse, saltRounds, (er, hash) => {
             if (er) console.log(er);
 
-            conn.query(query, [nom, hash], (err, result) => {
+            conn.query(query, [event.nom, hash], (err, result) => {
                 if (err) throw err;
                 res.status(201).json({result});
             });
         });
+
     });
-
-
 
 
 //  GET pour obtenir tous les événements
     app.get('/events', (req, res) => {
-        conn.connect(err => {
-            if (err) throw err;
 
-            const query = 'SELECT * FROM evenements';
-            conn.query(query, (err, results) => {
-                if (err) {
-                    console.error('Erreur lors de la récupération des événements : ' + err);
-                    res.status(500).json({ error: 'Erreur lors de la récupération des événements' });
-                    return;
-                }
-                res.json(results);
-            });
-        })
+
+        const query = 'SELECT * FROM evenements';
+        conn.query(query, (err, results) => {
+            if (err) {
+                console.error('Erreur lors de la récupération des événements : ' + err);
+                res.status(500).json({error: 'Erreur lors de la récupération des événements'});
+                return;
+            }
+            res.json(results);
+        });
+
     });
 
 //  POST pour ajouter un nouvel événement
     app.post('/addEvents', (req, res) => {
-        conn.connect(err => {
-            if (err) throw err;
 
-            const query = "INSERT INTO evenements (Titre, Date_event) VALUES ('"+req.query.titre+"', STR_TO_DATE('"+req.query.date+"', '%d/%m/%Y'))";
-            conn.query(query, (err, result) => {
-                if (err) {
-                    console.error('Erreur lors de l\'ajout de lévénement : ' + err);
-                    res.status(500).json({ error: 'Erreur lors de l\'ajout de l\'événement' });
-                    return;
-                }
-                res.status(201).json({result});
-            });
-        })
+
+        const query = "INSERT INTO evenements (Titre, Date_event) VALUES ('" + req.query.titre + "', STR_TO_DATE('" + req.query.date + "', '%d/%m/%Y'))";
+        conn.query(query, (err, result) => {
+            if (err) {
+                console.error('Erreur lors de l\'ajout de lévénement : ' + err);
+                res.status(500).json({error: 'Erreur lors de l\'ajout de l\'événement'});
+                return;
+            }
+            res.status(201).json({result});
+        });
+
     });
 
 //  DELETE pour supprimer un événement par son ID
     app.delete('/deleteEvents/:id', (req, res) => {
         const eventId = req.params.id;
 
-        conn.connect(err => {
-            if (err) throw err;
-
-            const query = 'DELETE FROM evenements WHERE id = ?';
-            conn.query(query, [eventId], (err, result) => {
-                if (err) {
-                    console.error('Erreur lors de la suppression de l\'événement : ' + err);
-                    res.status(500).json({ error: 'Erreur lors de la suppression de l\'événement' });
-                    return;
-                }
-                res.status(204).send();
-            });
-        })
-
+        const query = 'DELETE FROM evenements WHERE id = ?';
+        conn.query(query, [eventId], (err, result) => {
+            if (err) {
+                console.error('Erreur lors de la suppression de l\'événement : ' + err);
+                res.status(500).json({error: 'Erreur lors de la suppression de l\'événement'});
+                return;
+            }
+            res.status(204).send();
+        });
     });
+
+
 });
+
 
 const server = app.listen(8081, function () {
     const host = server.address().address;
