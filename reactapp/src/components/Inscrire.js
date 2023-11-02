@@ -8,7 +8,7 @@ function Inscrire() {
         const [validated, setValidated] = useState(false);
         const [username, setUsername] = useState("");
         const [password, setPassword] = useState("");
-
+        const [response,setResponse] = useState("");
         const handleSubmit = (event) => {
             const form = event.currentTarget;
             if (form.checkValidity() === false) {
@@ -19,16 +19,17 @@ function Inscrire() {
             console.log(username+" : "+password);
 
             procederInscription();
-            setValidated(true);
+
         };
 
         const procederInscription = () => {
+            setValidated(true);
             fetch("http://localhost:8081/addUser", {
-                method: "POST",
+                method: 'POST',
                 headers: {'Content-type': 'application/json'},
-                body: JSON.stringify({"nom": username, "motdepasse": password})
-            }).then( res => res.json())
-                .then(succes => console.log("Succes :",succes))
+                body: JSON.stringify({nom: username, motdepasse: password})
+            }).then( res => setResponse(res.json()))
+                .then(succ => console.log('Succes :',succ))
                 .catch(error => console.log(error));
         }
 
