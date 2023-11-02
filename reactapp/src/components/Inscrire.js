@@ -60,7 +60,7 @@ function Inscrire() {
                                           type="password"
                                           value={values.password}
                                           onChange={handleChange}
-                                          isValid={touched.password && !errors.password}
+                                          isValid={values.password.length >= 4 && touched.password && !errors.password}
                                           isInvalid={values.password.length < 4}
                                           required></Form.Control>
                         </Form.Group>
@@ -78,7 +78,6 @@ function Inscrire() {
                         </Button>
                     </Form>
                 )}
-
             </Formik>
 
 

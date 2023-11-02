@@ -77,7 +77,7 @@ conn.connect(err => {
         console.log("Table Evenements créée 👍");
     })
 
-
+    /********************** utilisateurs ************************************/
     // POST un nouvel utilisateur
     app.post('/addUser', (req, res) => {
         const event = req.body;
@@ -95,10 +95,43 @@ conn.connect(err => {
 
     });
 
+// POST pour connecter un utilisateur
+    app.post('/loginUser', (req, res) => {
+        const event = req.body;
 
+        const query = "SELECT * FROM utilisateurs WHERE Full_Name = ?";
+        conn.query(query, event.nom, (err, result) => {
+            if (err) throw err;
+
+            if (result.length > 0){
+                bcrypt.compare(event.motdepasse, result[0].Mot_De_Passe, (er, response) => {
+                    if (er) console.log(er);
+                    if(response){
+                        req.session.utilisateur = result
+                        res.send(req.session.utilisateur)
+                    }else{
+                        res.send({msg: "Mauvise autentication du nom d'utilisateur ou du mot de passe !"})
+                    }
+                });
+            }else{
+                res.send({msg: "Aucun utilisateur trouvé !"})
+            }
+        });
+    });
+
+    //GET machine pour obtenir l'état de la connexion d'utilisateur
+    app.get('/loginUser', (req,res) => {
+        if(req.session.utilisateur){
+            res.send({estConnecte: true, utilisateur: req.session.utilisateur});
+        }else{
+            res.send({estConnecte: false});
+        }
+    });
+
+
+    /********************** événements ************************************/
 //  GET pour obtenir tous les événements
     app.get('/events', (req, res) => {
-
 
         const query = 'SELECT * FROM evenements';
         conn.query(query, (err, results) => {
