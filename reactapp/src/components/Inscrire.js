@@ -1,4 +1,4 @@
-import React, {Component, useState} from 'react';
+import React, {useState} from 'react';
 import {NavLink} from "react-router-dom";
 import Form from "react-bootstrap/Form";
 import {Button} from "react-bootstrap";
@@ -17,9 +17,20 @@ function Inscrire() {
                 console.log("Tout est null");
             }
             console.log(username+" : "+password);
+
+            procederInscription();
             setValidated(true);
         };
 
+        const procederInscription = () => {
+            fetch("http://localhost:8081/addUser", {
+                method: "POST",
+                headers: {'Content-type': 'application/json'},
+                body: JSON.stringify({"nom": username, "motdepasse": password})
+            }).then( res => res.json())
+                .then(succes => console.log("Succes :",succes))
+                .catch(error => console.log(error));
+        }
 
         return (
             <div>

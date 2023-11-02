@@ -1,12 +1,15 @@
 const mysql = require("mysql");
-const connString = "mysql://urser-tp2:AVNS_K1Z7ax2UdEVbfuAtfQv@mysql-tp2-sm-tr-monptitdoigt29-4875.aivencloud.com:16151/tp2bd?ssl-mode=REQUIRED";
+const express = require('express');
+const bcrypt = require("bcrypt");
+const cors = require("cors")
 
-let conn = mysql.createConnection(connString);
 let sql;
-
-var express = require('express');
-var app = express();
+const saltRounds = 10;
+const connString = "mysql://urser-tp2:AVNS_K1Z7ax2UdEVbfuAtfQv@mysql-tp2-sm-tr-monptitdoigt29-4875.aivencloud.com:16151/tp2bd?ssl-mode=REQUIRED";
+let conn = mysql.createConnection(connString);
+const app = express();
 app.use(express.json());
+app.use(cors());
 
 app.use((req, res, next) => {
     res.header("Access-Control-Allow-Origin", "*");
@@ -15,7 +18,6 @@ app.use((req, res, next) => {
     console.log("requete recu !!!")
     next(); // permet de renvoyer la réponse et ainsi appeller la fonction ici-bas 
 });
-
 
 conn.connect(err => {
     if (err) throw err;
@@ -57,9 +59,33 @@ conn.connect(err => {
         if (err) throw err;
         console.log("Table Evenements créée 👍");
     })
+});
 
-    //  GET pour obtenir tous les événements
-    app.get('/events', (req, res) => {
+// POST un nouvel utilisateur
+app.post('/addUser', (req, res) => {
+    const nom = req.body.nom;
+    const motdepasse = req.body.motdepasse;
+
+    conn.connect(err => {
+        if (err) throw err;
+
+        const query = "INSERT INTO utilisateurs (Full_Name, Mot_De_Passe) VALUES (?,?)";
+        bcrypt.hash(motdepasse, saltRounds, (er, hash) => {
+            if (er) console.log(er);
+
+            conn.query(query, [nom, hash], (err, result) => {
+                if (err) throw err;
+                res.status(201).json({result});
+            });
+        });
+    });
+});
+
+//  GET pour obtenir tous les événements
+app.get('/events', (req, res) => {
+    conn.connect(err => {
+        if (err) throw err;
+
         const query = 'SELECT * FROM evenements';
         conn.query(query, (err, results) => {
             if (err) {
@@ -69,10 +95,14 @@ conn.connect(err => {
             }
             res.json(results);
         });
-    });
+    })
+});
 
-    //  POST pour ajouter un nouvel événement
-    app.post('/addEvents', (req, res) => {
+//  POST pour ajouter un nouvel événement
+app.post('/addEvents', (req, res) => {
+    conn.connect(err => {
+        if (err) throw err;
+
         const query = "INSERT INTO evenements (Titre, Date_event) VALUES ('"+req.query.titre+"', STR_TO_DATE('"+req.query.date+"', '%d/%m/%Y'))";
         conn.query(query, (err, result) => {
             if (err) {
@@ -82,11 +112,16 @@ conn.connect(err => {
             }
             res.status(201).json({result});
         });
-    });
+    })
+});
 
-    //  DELETE pour supprimer un événement par son ID
-    app.delete('/deleteEvents/:id', (req, res) => {
-        const eventId = req.params.id;
+//  DELETE pour supprimer un événement par son ID
+app.delete('/deleteEvents/:id', (req, res) => {
+    const eventId = req.params.id;
+
+    conn.connect(err => {
+        if (err) throw err;
+
         const query = 'DELETE FROM evenements WHERE id = ?';
         conn.query(query, [eventId], (err, result) => {
             if (err) {
@@ -96,14 +131,13 @@ conn.connect(err => {
             }
             res.status(204).send();
         });
-    });
-
-
-
+    })
 
 });
-var server = app.listen(8081, function () {
-    var host = server.address().address
-    var port = server.address().port
+
+
+const server = app.listen(8081, function () {
+    const host = server.address().address;
+    const port = server.address().port;
     console.log("TP2 Samba-Taha http://%s:%s", host, port)
-})
+});
