@@ -4,6 +4,21 @@ import Form from "react-bootstrap/Form";
 import {Button} from "react-bootstrap";
 
 function Inscrire() {
+   // https://react-bootstrap.github.io/docs/forms/validation/
+        const [validated, setValidated] = useState(false);
+        const [username, setUsername] = useState("");
+        const [password, setPassword] = useState("");
+
+        const handleSubmit = (event) => {
+            const form = event.currentTarget;
+            if (form.checkValidity() === false) {
+                event.preventDefault();
+                event.stopPropagation();
+                console.log("Tout est null");
+            }
+            console.log(username+" : "+password);
+            setValidated(true);
+        };
 
 
         return (
@@ -12,16 +27,16 @@ function Inscrire() {
                 <p>Créer un nouvel utilisateur</p>
 
 
-                <Form >
+                <Form noValidate validated={validated} onSubmit={handleSubmit}>
                     <Form.Group className="mb-3">
                         <Form.Label htmlFor="username">Nom d'utilisateur</Form.Label>
-                        <Form.Control name="username" type="text" required></Form.Control>
+                        <Form.Control name="username"  type="text" isInvalid={username.length < 1} onChange={e => setUsername(e.target.value)} required></Form.Control>
                         <Form.Control.Feedback type="invalid">Veuillez entrez au moins un caractère alphanumérique</Form.Control.Feedback>
                     </Form.Group>
                     <Form.Group className="mb-3">
                         <Form.Label htmlFor="password">Mot de passe</Form.Label>
-                        <Form.Control name="password" type="password"required></Form.Control>
-                        <Form.Control.Feedback type="invalid">Veullez entrer un mot de passe avec au moins 4 caractères</Form.Control.Feedback>
+                        <Form.Control name="password" type="password" isInvalid={password.length < 4} onChange={e => setPassword(e.target.value)} required></Form.Control>
+                        <Form.Control.Feedback type="invalid">Votre mot de passe doit contenir au moins 4 caractères</Form.Control.Feedback>
                     </Form.Group>
                     <Form.Group className="mb-3">
                         <Form.Text>
@@ -35,7 +50,6 @@ function Inscrire() {
                         Continuer
                     </Button>
                 </Form>
-
             </div>
         );
 
