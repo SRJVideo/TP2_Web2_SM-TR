@@ -19,7 +19,6 @@ function Inscrire() {
             console.log(username+" : "+password);
 
             procederInscription();
-
         };
 
         const procederInscription = () => {
@@ -28,8 +27,8 @@ function Inscrire() {
                 method: 'POST',
                 headers: {'Content-type': 'application/json'},
                 body: JSON.stringify({nom: username, motdepasse: password})
-            }).then( res => setResponse(res.json()))
-                .then(succ => console.log('Succes :',succ))
+            }).then( res => res.json())
+                .then(succ => setResponse(succ))
                 .catch(error => console.log(error));
         }
 
@@ -62,9 +61,9 @@ function Inscrire() {
                         Continuer
                     </Button>
                 </Form>
+                <div>{response}</div>
             </div>
         );
-
 }
 
 export default Inscrire;
