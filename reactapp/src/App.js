@@ -4,6 +4,7 @@ import {Container} from "react-bootstrap";
 import Accueil from "./components/Accueil";
 import Inscrire from "./components/Inscrire";
 import Connecter from "./components/Connecter";
+import Calendrier from "./components/Calendrier";
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap/dist/js/bootstrap.js';
 
@@ -17,6 +18,7 @@ function App() {
                     <Route exact path="/inscrire" element={<Inscrire/>}/>
                     <Route exact path="/connecter" element={<Connecter/>} />
                     <Route exact path="/" element={<Accueil/>}/>
+                    <Route path="/calendrier" element={<Calendrier />} />
                 </Routes>
             </Container>
         </BrowserRouter>
