@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
+import frLocale from '@fullcalendar/core/locales/fr';
+
 
 function DemoApp() {
     const [events, setEvents] = useState([]);
@@ -41,6 +43,7 @@ function DemoApp() {
                 weekends={true}
                 events={events}
                 eventClick={(info) => supprimerEvenement(info.event)}
+                locale={frLocale}
             />
         </div>
     );
