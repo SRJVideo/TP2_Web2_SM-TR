@@ -16,7 +16,7 @@ function DemoApp() {
 
     const ajouterEvenement = () => {
         const title = prompt("Nom de l'événement:");
-        const date = prompt("Date de l'événement (YYYY-MM-DD):");
+        const date = prompt("Date de l'événement (DD/MM/YYYY):");
         axios.post('/api/evenements', { title, date }).then(response => {
             setEvents([...events, response.data]);
         });
