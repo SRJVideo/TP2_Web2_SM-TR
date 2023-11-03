@@ -8,6 +8,8 @@ import Calendrier from "./components/Calendrier";
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap/dist/js/bootstrap.js';
 
+//deploiement : https://tp2-deploiement-react-sm-tr.vercel.app/
+
 function App() {
   return (
     <div className="App">
