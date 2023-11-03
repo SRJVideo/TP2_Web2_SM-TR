@@ -16,6 +16,7 @@ function Connecter() {
     });
 
     const procederInscription = (formik) => {
+        // NE PAS OUBLIER DE CHANGER LA FIN DU TP !!!  URL deploy node == https://samba-taha-node-tp2.onrender.com
         fetch("http://localhost:8081/loginUser", {
             method: 'POST',
             headers: {'Content-type': 'application/json'},
@@ -31,6 +32,7 @@ function Connecter() {
 
     // Sert une fois que la page est rechargé
     useEffect(() => {
+        // NE PAS OUBLIER DE CHANGER LA FIN DU TP !!!  URL deploy node == https://samba-taha-node-tp2.onrender.com
         fetch("http://localhost:8081/loginUser").then(res => res.json())
             .then(res => {
                if(res['estConnecte']) {console.log(res['utilisateur']);}

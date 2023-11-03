@@ -17,6 +17,7 @@ function Inscrire() {
         console.log(formik.username)
         console.log(formik.password)
 
+        // NE PAS OUBLIER DE CHANGER LA FIN DU TP !!!  URL deploy node == https://samba-taha-node-tp2.onrender.com
         fetch("http://localhost:8081/addUser", {
             method: 'POST',
             headers: {'Content-type': 'application/json'},
