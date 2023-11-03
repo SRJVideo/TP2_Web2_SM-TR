@@ -37,6 +37,8 @@ function DemoApp() {
             <h1 className='MyCalendar' style={{ textAlign: "left" }}>Calendrier</h1>
             <button onClick={chargerEvenements}>Charger les événements</button>
             <button onClick={ajouterEvenement}>Ajouter un événement</button>
+            <button onClick={supprimerEvenement}>supprimer un événement</button>
+
             <FullCalendar
                 plugins={[dayGridPlugin]}
                 initialView="dayGridMonth"
