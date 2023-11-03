@@ -5,6 +5,7 @@ import {NavLink} from "react-router-dom";
 import * as formik from "formik";
 import * as yup from "yup";
 
+//  https://codewithhugo.com/pass-cookies-axios-fetch-requests/
 function Connecter() {
     const {Formik} = formik;
     const [loggedUser, setLooggedUser] = useState(undefined)
@@ -18,9 +19,12 @@ function Connecter() {
         fetch("http://localhost:8081/loginUser", {
             method: 'POST',
             headers: {'Content-type': 'application/json'},
+            credentials: 'same-origin',
             body: JSON.stringify({nom: formik.username, motdepasse: formik.password})
         }).then(res => res.json())
-            .then(succ => console.log( succ))
+            .then(succ => {
+                setLooggedUser(succ[0].Full_Name);
+            })
             .catch(error => console.log(error));
 
     };
@@ -28,9 +32,9 @@ function Connecter() {
     // Sert une fois que la page est rechargé
     useEffect(() => {
         fetch("http://localhost:8081/loginUser").then(res => res.json())
-            .then(succ => {
-                 console.log(succ);
-            });
+            .then(res => {
+               if(res['estConnecte']) {console.log(res['utilisateur']);}
+            }).catch(error => console.log(error));;
     }, [])
 
     return (<div>

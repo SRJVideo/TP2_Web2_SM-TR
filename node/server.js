@@ -21,11 +21,11 @@ app.use(cors({
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(session({
-    key: "userID",
+    key: "userID",                              //nom du cookie que l'on crée
     secret: "secret du groupe !",
     // https://stackoverflow.com/questions/40381401/when-to-use-saveuninitialized-and-resave-in-express-session
-    resave: false,
-    saveUninitialized: false,
+    resave: false,                              // sauvegarde un objet cookie
+    saveUninitialized: true,                    // sauvegarder une session [seulement quand il ya nouvelle modif (false)/ tout le temps (true)]
     cookie: {expires: 60 * 60 * 24}
 }));
 app.use((req, res, next) => {
@@ -89,11 +89,21 @@ conn.connect(err => {
 
             conn.query(query, [event.nom, hash], (err, result) => {
                 if (err) throw err;
-                res.status(201).json({result});
+                res.status(201).json([result]);
             });
         });
 
     });
+
+    //GET machine pour obtenir l'état de la connexion d'utilisateur
+    app.get('/loginUser', (req,res) => {
+        if(req.session.user){
+            res.send({estConnecte: true, utilisateur: req.session.user});
+        }else{
+            res.send({estConnecte: false});
+        }
+    });
+
 
 // POST pour connecter un utilisateur
     app.post('/loginUser', (req, res) => {
@@ -107,10 +117,11 @@ conn.connect(err => {
                 bcrypt.compare(event.motdepasse, result[0].Mot_De_Passe, (er, response) => {
                     if (er) console.log(er);
                     if(response){
-                        req.session.utilisateur = result
-                        res.send(req.session.utilisateur)
+                        console.log("Mot de Passe compare: ", response);
+                        req.session.user = result;
+                        res.send(result);
                     }else{
-                        res.send({msg: "Mauvise autentication du nom d'utilisateur ou du mot de passe !"})
+                        res.send({msg: "Mauvise authentication du nom d'utilisateur ou du mot de passe !"})
                     }
                 });
             }else{
@@ -119,14 +130,6 @@ conn.connect(err => {
         });
     });
 
-    //GET machine pour obtenir l'état de la connexion d'utilisateur
-    app.get('/loginUser', (req,res) => {
-        if(req.session.utilisateur){
-            res.send({estConnecte: true, utilisateur: req.session.utilisateur});
-        }else{
-            res.send({estConnecte: false});
-        }
-    });
 
 
     /********************** événements ************************************/
