@@ -1,64 +1,49 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
-import axios from 'axios';
 
-function Calendrier  ()  {
-  const [events, setEvents] = useState([]);
-  const [loading, setLoading] = useState(false);
+function DemoApp() {
+    const [events, setEvents] = useState([]);
 
-  const loadEvents = () => {
-    setLoading(true);
-    // Chargez les événements depuis la base de données (remplacez l'URL par votre propre API)
-    axios.get('/api/events')
-      .then((response) => {
-        setEvents(response.data);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error(error);
-        setLoading(false);
-      });
-  };
+    const chargerEvenements = () => {
+        axios.get('/api/evenements').then(response => {
+            setEvents(response.data);
+        });
+    };
 
-  const handleEventAdd = (eventInfo) => {
-    // Envoyez la demande d'ajout d'événement à la base de données (POST request)
-    axios.post('/api/events', eventInfo.event.toPlainObject())
-      .then((response) => {
-        setEvents([...events, response.data]);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  };
+    const ajouterEvenement = () => {
+        const title = prompt("Nom de l'événement:");
+        const date = prompt("Date de l'événement (YYYY-MM-DD):");
+        axios.post('/api/evenements', { title, date }).then(response => {
+            setEvents([...events, response.data]);
+        });
+    };
 
-  const handleEventRemove = (eventInfo) => {
-    // Envoyez la demande de suppression d'événement à la base de données (DELETE request)
-    axios.delete(`/api/events/${eventInfo.event.id}`)
-      .then(() => {
-        setEvents(events.filter((event) => event.id !== eventInfo.event.id));
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  };
+    const supprimerEvenement = (event) => {
+        const confirmed = window.confirm(`Supprimer l'événement "${event.title}" ?`);
+        if (confirmed) {
+            axios.delete(`/api/evenements/${event.id}`).then(() => {
+                const newEvents = events.filter(e => e.id !== event.id);
+                setEvents(newEvents);
+            });
+        }
+    };
 
-  return (
-    <div>
-      <h1 className='MyCalendar' style={{ textAlign: 'left' }}>Calendrier</h1>
-      <button onClick={loadEvents} disabled={loading}>
-        Charger les événements
-      </button>
-      <FullCalendar
-        plugins={[dayGridPlugin]}
-        initialView='dayGridMonth'
-        weekends={true}
-        events={events}
-        eventClick={handleEventRemove}
-        dateClick={handleEventAdd}
-      />
-    </div>
-  );
-};
+    return (
+        <div>
+            <h1 className='MyCalendar' style={{ textAlign: "left" }}>Calendrier</h1>
+            <button onClick={chargerEvenements}>Charger les événements</button>
+            <button onClick={ajouterEvenement}>Ajouter un événement</button>
+            <FullCalendar
+                plugins={[dayGridPlugin]}
+                initialView="dayGridMonth"
+                weekends={true}
+                events={events}
+                eventClick={(info) => supprimerEvenement(info.event)}
+            />
+        </div>
+    );
+}
 
-export default Calendrier;
+export default DemoApp;

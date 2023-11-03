@@ -6,6 +6,8 @@ function Navbar() {
                 <li><NavLink exact to="/">Accueil</NavLink></li>
                 <li><NavLink to="/connecter">Se connecter</NavLink></li>
                 <li><NavLink to="/inscrire">S'inscrire</NavLink></li>
+                <li><NavLink to="/calendrier">Calendrier</NavLink></li>
+
             </ul>
         </nav>
     );
