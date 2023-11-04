@@ -1,89 +1,79 @@
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import Form from 'react-bootstrap/Form';
 import {Button, Col} from "react-bootstrap";
 import {NavLink} from "react-router-dom";
-import * as formik from "formik";
-import * as yup from "yup";
 
 //  https://codewithhugo.com/pass-cookies-axios-fetch-requests/
-function Connecter() {
-    const {Formik} = formik;
-    const [loggedUser, setLooggedUser] = useState(undefined)
+class Connecter extends React.Component {
 
-    const schema = yup.object().shape({
-        username: yup.string().required(),
-        password: yup.string().required(),
-    });
-
-    const procederInscription = (formik) => {
-        // NE PAS OUBLIER DE CHANGER LA FIN DU TP !!!  URL deploy node == https://samba-taha-node-tp2.onrender.com
-        fetch("http://localhost:8081/loginUser", {
+    state = {
+        username: '',
+        password: ''
+    }
+    procederConnexion =  async () => {
+        // samba-taha-node-tp2.onrender.com
+        await fetch("http://localhost:8081/loginUser", {
             method: 'POST',
             headers: {'Content-type': 'application/json'},
-            credentials: 'same-origin',
-            body: JSON.stringify({nom: formik.username, motdepasse: formik.password})
-        }).then(res => res.json())
-            .then(succ => {
-                setLooggedUser(succ[0].Full_Name);
-            })
-            .catch(error => console.log(error));
+            body: JSON.stringify({nom: this.state.username, motdepasse: this.state.password})
+        }).then( async res =>  await res.json())
+            .then(async succ => await  console.log(  succ) )
 
     };
 
-    // Sert une fois que la page est rechargé
-    useEffect(() => {
-        // NE PAS OUBLIER DE CHANGER LA FIN DU TP !!!  URL deploy node == https://samba-taha-node-tp2.onrender.com
-        fetch("http://localhost:8081/loginUser").then(res => res.json())
-            .then(res => {
-               if(res['estConnecte']) {console.log(res['utilisateur']);}
-            }).catch(error => console.log(error));;
-    }, [])
 
-    return (<div>
-            <h1>Se Connecter</h1>
-            <p>{loggedUser === undefined ? "Créer un nouvel utilisateur" : loggedUser}</p>
+    handleChange =(e)=> {
+        this.setState({
+            [e.target.name]: e.target.value
+        })
+    }
+
+    handleSubmit = (event) => {
+        const form = event.currentTarget;
+        if (form.checkValidity() === false) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+
+        this.procederConnexion().catch(error => console.log(error));
+    };
 
 
-            <Formik
-                validationSchema={schema}
-                onSubmit={procederInscription}
-                initialValues={{
-                    username: '',
-                    password: '',
-                }}
-            >
-                {({handleSubmit, handleChange, values, touched, errors}) => (
-                    <Form noValidate onSubmit={handleSubmit}>
-                        <Form.Group as={Col} className="mb-3">
-                            <Form.Label htmlFor="username">Nom d'utilisateur</Form.Label>
-                            <Form.Control name="username"
-                                          type="text"
-                                          value={values.username}
-                                          onChange={handleChange}
-                                          required></Form.Control>
-                        </Form.Group>
-                        <Form.Group className="mb-3">
-                            <Form.Label htmlFor="password">Mot de passe</Form.Label>
-                            <Form.Control name="password"
-                                          type="password"
-                                          value={values.password}
-                                          onChange={handleChange}
-                                          required></Form.Control>
-                        </Form.Group>
-                        <Form.Group className="mb-3">
-                            <Form.Text muted>Vons n'avez pas de compte ?&nbsp;
-                                <NavLink to="/inscrire">Inscrivez-vous</NavLink>
-                                &nbsp;ici</Form.Text>
-                        </Form.Group>
+    render() {
+        return (
+            <div>
+                <h1>Se Connecter</h1>
+                <p>Connecter un utilisateur existant</p>
+                <Form noValidate  onSubmit={this.handleSubmit} >
+                    <Form.Group as={Col} className="mb-3">
+                        <Form.Label htmlFor="username">Nom d'utilisateur</Form.Label>
+                        <Form.Control name="username"
+                                      type="text"
+                                      onError={() => this.state.username.length < 1}
+                                      onChange={this.handleChange}
+                                      required></Form.Control>
+                    </Form.Group>
+                    <Form.Group className="mb-3">
+                        <Form.Label htmlFor="password">Mot de passe</Form.Label>
+                        <Form.Control name="password"
+                                      type="password"
+                                      onError={() => this.state.password.length < 4}
+                                      onChange={this.handleChange}
+                                      required></Form.Control>
+                    </Form.Group>
+                    <Form.Group className="mb-3">
+                        <Form.Text muted>Vons n'avez pas de compte ?&nbsp;
+                            <NavLink to="/inscrire">Inscrivez-vous</NavLink>
+                            &nbsp;ici</Form.Text>
+                    </Form.Group>
 
-                        <Button variant="primary" type="submit">
-                            Continuer
-                        </Button>
-                    </Form>
-                )}
-            </Formik>
-        </div>
-    );
+                    <Button variant="primary" type="submit">
+                        Continuer
+                    </Button>
+                </Form>
+            </div>
+        );
+    }
 }
 
 export default Connecter;

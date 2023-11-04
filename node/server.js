@@ -26,14 +26,13 @@ app.use(session({
     secret: "secret du groupe !",
     // https://stackoverflow.com/questions/40381401/when-to-use-saveuninitialized-and-resave-in-express-session
     resave: false,                              // sauvegarde un objet cookie
-    saveUninitialized: true,                    // sauvegarder une session [seulement quand il ya nouvelle modif (false)/ tout le temps (true)]
-    cookie: {expires: 60 * 60 * 24}
+    saveUninitialized: false,                   // sauvegarder une session [seulement quand il ya nouvelle modif (false)/ tout le temps (true)]
+    cookie: {expires: 1000* 60 * 60 * 24},
 }));
 app.use((req, res, next) => {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    console.log("");
-    console.log("requete recu !!!")
+    res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
+    res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    console.log("\nrequete recu !!!")
     next();
 });
 
@@ -77,12 +76,11 @@ conn.connect(err => {
         if (err) throw err;
         console.log("Table Evenements créée 👍");
     })
-
+});
     /********************** utilisateurs ************************************/
     // POST un nouvel utilisateur
     app.post('/addUser', (req, res) => {
         const event = req.body;
-
 
         const query = "INSERT INTO utilisateurs (Full_Name, Mot_De_Passe) VALUES (?,?);";
         bcrypt.hash(event.motdepasse, saltRounds, (er, hash) => {
@@ -90,47 +88,67 @@ conn.connect(err => {
 
             conn.query(query, [event.nom, hash], (err, result) => {
                 if (err) throw err;
-                res.status(201).json([result]);
+                res.status(201).send(result);
             });
         });
 
     });
 
     //GET machine pour obtenir l'état de la connexion d'utilisateur
-    app.get('/loginUser', (req,res) => {
-        if(req.session.user){
-            res.send({estConnecte: true, utilisateur: req.session.user});
+    app.get('/login', (req, res) => {
+        if (req.session.user) {
+             res.send({estConnecte: true, utilisateur: req.session.user[0]});
         }else{
-            res.send({estConnecte: false});
+             res.send({estConnecte: false});
         }
     });
 
+    // app.get('/logout', (req,res)=>{
+    //     if( !req.session.destroyed){
+    //         req.session.destroy();
+    //         res.send("Déconnexion");
+    //     }
+    // })
+
 
 // POST pour connecter un utilisateur
-    app.post('/loginUser', (req, res) => {
+    app.post('/login', express.urlencoded({extended: false}),(req, res) => {
         const event = req.body;
 
         const query = "SELECT * FROM utilisateurs WHERE Full_Name = ?";
         conn.query(query, event.nom, (err, result) => {
-            if (err) throw err;
+            if (err) res.send({err: err});
 
-            if (result.length > 0){
-                bcrypt.compare(event.motdepasse, result[0].Mot_De_Passe, (er, response) => {
-                    if (er) console.log(er);
-                    if(response){
-                        console.log("Mot de Passe compare: ", response);
-                        req.session.user = result;
-                        res.send(result);
-                    }else{
-                        res.send({msg: "Mauvise authentication du nom d'utilisateur ou du mot de passe !"})
+            if (result.length > 0) {
+                bcrypt.compare(event.motdepasse, result[0].Mot_De_Passe, (error, response) => {
+                    console.log("Mot de Passe compare: ", response);
+                    if (response) {
+                        // https://expressjs.com/en/resources/middleware/session.html
+                        //1 - regenerate the session, which is good practice to help
+                        // guard against forms of session fixation
+                        req.session.regenerate((er) => {
+                            if (er) throw er;
+
+                            //2 - store user information in session, typically a user id
+                            req.session.user = result;
+
+                            //3 save the session before redirection to ensure page
+                            // load does not happen before session is saved
+                            req.session.save((e) => {
+                                if (e) console.log( e);
+                                console.log(req.session.user);
+                                res.send(result);
+                            })
+                        })
+                    } else {
+                        res.status(502).send({msg: "Mauvaise authentication du nom d'utilisateur ou du mot de passe !"})
                     }
                 });
-            }else{
-                res.send({msg: "Aucun utilisateur trouvé !"})
+            } else {
+                res.status(502).send({msg: "Aucun utilisateur trouvé !"})
             }
         });
     });
-
 
 
     /********************** événements ************************************/
@@ -181,7 +199,7 @@ conn.connect(err => {
     });
 
 
-});
+
 
 
 const server = app.listen(8081, function () {
