@@ -27,7 +27,7 @@ app.use(session({
     // https://stackoverflow.com/questions/40381401/when-to-use-saveuninitialized-and-resave-in-express-session
     resave: false,                              // sauvegarde un objet cookie
     saveUninitialized: false,                   // sauvegarder une session [seulement quand il ya nouvelle modif (false)/ tout le temps (true)]
-    cookie: {expires: 1000* 60 * 60 * 24},
+    cookie: {expires: 1000 * 60 * 60 * 24},
 }));
 app.use((req, res, next) => {
     res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
@@ -77,129 +77,134 @@ conn.connect(err => {
         console.log("Table Evenements créée 👍");
     })
 });
-    /********************** utilisateurs ************************************/
-    // POST un nouvel utilisateur
-    app.post('/addUser', (req, res) => {
-        const event = req.body;
+/********************** utilisateurs ************************************/
+// POST un nouvel utilisateur
+app.post('/addUser', (req, res) => {
+    const event = req.body;
 
-        const query = "INSERT INTO utilisateurs (Full_Name, Mot_De_Passe) VALUES (?,?);";
-        bcrypt.hash(event.motdepasse, saltRounds, (er, hash) => {
-            if (er) console.log(er);
+    const query = "INSERT INTO utilisateurs (Full_Name, Mot_De_Passe) VALUES (?,?);";
+    bcrypt.hash(event.motdepasse, saltRounds, (er, hash) => {
+        if (er) console.log(er);
 
-            conn.query(query, [event.nom, hash], (err, result) => {
-                if (err) throw err;
-                res.status(201).send(result);
-            });
+        conn.query(query, [event.nom, hash], (err, result) => {
+            if (err) throw err;
+            res.status(201).send(result);
         });
-
     });
 
-    //GET machine pour obtenir l'état de la connexion d'utilisateur
-    app.get('/login', (req, res) => {
-        if (req.session.user) {
-             res.send({estConnecte: true, utilisateur: req.session.user[0]});
-        }else{
-             res.send({estConnecte: false});
-        }
-    });
+});
 
-    // app.get('/logout', (req,res)=>{
-    //     if( !req.session.destroyed){
-    //         req.session.destroy();
-    //         res.send("Déconnexion");
-    //     }
-    // })
+//GET machine pour obtenir l'état de la connexion d'utilisateur
+app.get('/login', (req, res) => {
+    if (req.session.user) {
+        return res.send({estConnecte: true, utilisateur: req.session.user[0]});
+    } else {
+        return res.send({estConnecte: false});
+    }
+});
+
+app.get('/logout', (req, res) => {
+        req.session.user = undefined;
+        req.session.save((er) => {
+            if (er) throw er
+
+            // regenerate the session, which is good practice to help
+            // guard against forms of session fixation
+            req.session.regenerate(function (e) {
+                if (e) throw e
+            })
+        })
+        return res.json("Déconnexion");
+
+})
 
 
 // POST pour connecter un utilisateur
-    app.post('/login', express.urlencoded({extended: false}),(req, res) => {
-        const event = req.body;
+app.post('/login', express.urlencoded({extended: false}), (req, res) => {
+    const event = req.body;
 
-        const query = "SELECT * FROM utilisateurs WHERE Full_Name = ?";
-        conn.query(query, event.nom, (err, result) => {
-            if (err) res.send({err: err});
+    const query = "SELECT * FROM utilisateurs WHERE Full_Name = ?";
+    conn.query(query, event.nom, (err, result) => {
+        if (err) res.send({err: err});
 
-            if (result.length > 0) {
-                bcrypt.compare(event.motdepasse, result[0].Mot_De_Passe, (error, response) => {
-                    console.log("Mot de Passe compare: ", response);
-                    if (response) {
-                        // https://expressjs.com/en/resources/middleware/session.html
-                        //1 - regenerate the session, which is good practice to help
-                        // guard against forms of session fixation
-                        req.session.regenerate((er) => {
-                            if (er) throw er;
+        if (result.length > 0) {
+            bcrypt.compare(event.motdepasse, result[0].Mot_De_Passe, (error, response) => {
+                console.log("Mot de Passe compare: ", response);
+                if (response) {
+                    // https://expressjs.com/en/resources/middleware/session.html
+                    //1 - regenerate the session, which is good practice to help
+                    // guard against forms of session fixation
+                    req.session.regenerate((er) => {
+                        if (er) throw er;
 
-                            //2 - store user information in session, typically a user id
-                            req.session.user = result;
+                        //2 - store user information in session, typically a user id
+                        req.session.user = result;
 
-                            //3 save the session before redirection to ensure page
-                            // load does not happen before session is saved
-                            req.session.save((e) => {
-                                if (e) console.log( e);
-                                console.log(req.session.user);
-                                res.send(result);
-                            })
+                        //3 save the session before redirection to ensure page
+                        // load does not happen before session is saved
+                        req.session.save((e) => {
+                            if (e) console.log(e);
+                            console.log(req.session.user);
+                            res.send(result);
                         })
-                    } else {
-                        res.status(502).send({msg: "Mauvaise authentication du nom d'utilisateur ou du mot de passe !"})
-                    }
-                });
-            } else {
-                res.status(502).send({msg: "Aucun utilisateur trouvé !"})
-            }
-        });
+                    })
+                } else {
+                    res.status(502).send({msg: "Mauvaise authentication du nom d'utilisateur ou du mot de passe !"})
+                }
+            });
+        } else {
+            res.status(502).send({msg: "Aucun utilisateur trouvé !"})
+        }
     });
+});
 
 
-    /********************** événements ************************************/
+/********************** événements ************************************/
 //  GET pour obtenir tous les événements
-    app.get('/events', (req, res) => {
+app.get('/events', (req, res) => {
 
-        const query = 'SELECT * FROM evenements';
-        conn.query(query, (err, results) => {
-            if (err) {
-                console.error('Erreur lors de la récupération des événements : ' + err);
-                res.status(500).json({error: 'Erreur lors de la récupération des événements'});
-                return;
-            }
-            res.json(results);
-        });
-
+    const query = 'SELECT * FROM evenements';
+    conn.query(query, (err, results) => {
+        if (err) {
+            console.error('Erreur lors de la récupération des événements : ' + err);
+            res.status(500).json({error: 'Erreur lors de la récupération des événements'});
+            return;
+        }
+        res.json(results);
     });
+
+});
 
 //  POST pour ajouter un nouvel événement
-    app.post('/addEvents', (req, res) => {
+app.post('/addEvents', (req, res) => {
 
 
-        const query = "INSERT INTO evenements (Titre, Date_event) VALUES ('" + req.query.titre + "', STR_TO_DATE('" + req.query.date + "', '%d/%m/%Y'))";
-        conn.query(query, (err, result) => {
-            if (err) {
-                console.error('Erreur lors de l\'ajout de lévénement : ' + err);
-                res.status(500).json({error: 'Erreur lors de l\'ajout de l\'événement'});
-                return;
-            }
-            res.status(201).json({result});
-        });
-
+    const query = "INSERT INTO evenements (Titre, Date_event) VALUES ('" + req.query.titre + "', STR_TO_DATE('" + req.query.date + "', '%d/%m/%Y'))";
+    conn.query(query, (err, result) => {
+        if (err) {
+            console.error('Erreur lors de l\'ajout de lévénement : ' + err);
+            res.status(500).json({error: 'Erreur lors de l\'ajout de l\'événement'});
+            return;
+        }
+        res.status(201).json({result});
     });
+
+});
 
 //  DELETE pour supprimer un événement par son ID
-    app.delete('/deleteEvents/:id', (req, res) => {
-        const eventId = req.params.id;
+app.delete('/deleteEvents/:id', (req, res) => {
+    const eventId = req.params.id;
 
-        const query = 'DELETE FROM evenements WHERE id = ?';
-        conn.query(query, [eventId], (err, result) => {
-            if (err) {
-                console.error('Erreur lors de la suppression de l\'événement : ' + err);
-                res.status(500).json({error: 'Erreur lors de la suppression de l\'événement'});
-                return;
-            }
-            res.status(204).send();
-        });
+    const query = 'DELETE FROM evenements WHERE id = ?';
+    conn.query(query, [eventId], (err, result) => {
+        if (err) {
+            console.error('Erreur lors de la suppression de l\'événement : ' + err);
+            res.status(500).json({error: 'Erreur lors de la suppression de l\'événement'});
+            return;
+        }
+        res.status(204).send();
     });
-
-
-
+});
 
 
 const server = app.listen(8081, function () {
