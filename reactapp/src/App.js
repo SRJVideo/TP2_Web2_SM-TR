@@ -3,7 +3,7 @@ import Navbar from "./components/Navbar";
 import {Container} from "react-bootstrap";
 import Accueil from "./components/Accueil";
 import Inscrire from "./components/Inscrire";
-import Connecter from "./components/ConnecterF";
+import Connecter from "./components/Connecter";
 import Calendrier from "./components/Calendrier";
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap/dist/js/bootstrap.js';

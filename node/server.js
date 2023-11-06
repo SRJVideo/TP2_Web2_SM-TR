@@ -145,7 +145,7 @@ app.post('/login', express.urlencoded({extended: false}), (req, res) => {
                         req.session.save((e) => {
                             if (e) console.log(e);
                             console.log(req.session.user);
-                            res.send(result);
+                            res.json("Un utilisateur est connecté");
                         })
                     })
                 } else {

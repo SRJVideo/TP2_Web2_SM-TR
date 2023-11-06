@@ -1,79 +1,65 @@
-import React from 'react';
-import Form from 'react-bootstrap/Form';
-import {Button, Col} from "react-bootstrap";
-import {NavLink} from "react-router-dom";
+import {useState} from 'react';
+import Form from "react-bootstrap/Form";
+import {Button} from "react-bootstrap";
+import {NavLink, useNavigate} from "react-router-dom";
+import Axios from "axios";
 
-//  https://codewithhugo.com/pass-cookies-axios-fetch-requests/
-class Connecter extends React.Component {
-
-    state = {
+function Connecter() {
+    const [values, setValues] = useState({
         username: '',
         password: ''
+    })
+    const nav = useNavigate();
+    const handleChange = (e) => {
+        setValues({...values, [e.target.name]: e.target.value})
     }
-    procederConnexion =  async () => {
+
+    Axios.defaults.withCredentials = true;
+    const handleSubmit = (event) => {
+        event.preventDefault();
+
         // samba-taha-node-tp2.onrender.com
-        await fetch("http://localhost:8081/loginUser", {
-            method: 'POST',
-            headers: {'Content-type': 'application/json'},
-            body: JSON.stringify({nom: this.state.username, motdepasse: this.state.password})
-        }).then( async res =>  await res.json())
-            .then(async succ => await  console.log(  succ) )
-
+    Axios.post("http://localhost:8081/login", {nom: values.username,  motdepasse: values.password,})
+            .then((response) => {
+                response.data.msg  ? console.log( response.data.msg ) :  nav('/calendrier');
+                if(!response.data.msg) window.location.reload(true);
+            })
     };
 
 
-    handleChange =(e)=> {
-        this.setState({
-            [e.target.name]: e.target.value
-        })
-    }
+    return (
+        <div>
+            <h1>Se Connecter</h1>
+            <p>Connecter un utilisateur existant</p>
+            <Form noValidate onSubmit={handleSubmit}>
+                <Form.Group className="mb-3">
+                    <Form.Label htmlFor="username">Nom d'utilisateur</Form.Label>
+                    <Form.Control name="username"
+                                  type="text"
+                                  onChange={handleChange}
+                                  isValid={values.username > 1}
+                                  required></Form.Control>
+                </Form.Group>
+                <Form.Group className="mb-3">
+                    <Form.Label htmlFor="password">Mot de passe</Form.Label>
+                    <Form.Control name="password"
+                                  type="password"
+                                  onChange={handleChange}
+                                  isValid={values.password > 4}
+                                  required></Form.Control>
+                </Form.Group>
+                <Form.Group className="mb-3">
+                    <Form.Text muted>Vons n'avez pas de compte ?&nbsp;
+                        <NavLink to="/inscrire">Inscrivez-vous</NavLink>
+                        &nbsp;ici</Form.Text>
+                </Form.Group>
+                <Button variant="primary" type="submit">
+                    Continuer
+                </Button>
 
-    handleSubmit = (event) => {
-        const form = event.currentTarget;
-        if (form.checkValidity() === false) {
-            event.preventDefault();
-            event.stopPropagation();
-        }
-
-        this.procederConnexion().catch(error => console.log(error));
-    };
-
-
-    render() {
-        return (
-            <div>
-                <h1>Se Connecter</h1>
-                <p>Connecter un utilisateur existant</p>
-                <Form noValidate  onSubmit={this.handleSubmit} >
-                    <Form.Group as={Col} className="mb-3">
-                        <Form.Label htmlFor="username">Nom d'utilisateur</Form.Label>
-                        <Form.Control name="username"
-                                      type="text"
-                                      onError={() => this.state.username.length < 1}
-                                      onChange={this.handleChange}
-                                      required></Form.Control>
-                    </Form.Group>
-                    <Form.Group className="mb-3">
-                        <Form.Label htmlFor="password">Mot de passe</Form.Label>
-                        <Form.Control name="password"
-                                      type="password"
-                                      onError={() => this.state.password.length < 4}
-                                      onChange={this.handleChange}
-                                      required></Form.Control>
-                    </Form.Group>
-                    <Form.Group className="mb-3">
-                        <Form.Text muted>Vons n'avez pas de compte ?&nbsp;
-                            <NavLink to="/inscrire">Inscrivez-vous</NavLink>
-                            &nbsp;ici</Form.Text>
-                    </Form.Group>
-
-                    <Button variant="primary" type="submit">
-                        Continuer
-                    </Button>
-                </Form>
-            </div>
-        );
-    }
+            </Form>
+        </div>
+    );
 }
 
 export default Connecter;
