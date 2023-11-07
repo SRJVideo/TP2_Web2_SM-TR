@@ -14,8 +14,8 @@ function DemoApp() {
 
             let evsJson = response.data.map(({ Titre, Date_event }) => {
             //  moment(Date_Event).format("YYYY-MM-DD")    --- C'est la supposée date
-            console.log(Titre)
-                return { titre: Titre, date: moment(Date_event).format("YYYY-MM-DD") }
+            console.log(Titre.value)
+                return {title: Titre, date: moment(Date_event).format("YYYY-MM-DD") }
             })
             
 
@@ -59,6 +59,10 @@ function DemoApp() {
                 initialView="dayGridMonth"
                 weekends={true}
                 events={events}
+                // events={[
+                //     { title: "Début TP1", date: '2023-09-12' },
+                //     { title: "Remise TP1", date: '2023-09-26' }
+                //   ]}
                 eventClick={(info) => supprimerEvenement(info.event)}
                 locale={frLocale}
             />
