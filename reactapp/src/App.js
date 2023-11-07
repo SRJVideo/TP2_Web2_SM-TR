@@ -23,7 +23,7 @@ function App() {
         Axios.get("http://localhost:8081/login").then((response) => {
                     setLooggedUser(response.data.estConnecte === true ? response.data.utilisateur : undefined);
             })
-            console.log(loggedUser);
+
         }, [loggedUser])
 
         return (

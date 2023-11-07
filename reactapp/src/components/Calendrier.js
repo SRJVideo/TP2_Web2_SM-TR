@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import moment from 'moment';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import frLocale from '@fullcalendar/core/locales/fr';
@@ -10,15 +11,29 @@ function DemoApp() {
 
     const chargerEvenements = () => {
         axios.get('http://localhost:8081/events').then(response => {
-            setEvents(response.data);
+
+            let evsJson = response.data.map(({ Titre, Date_event }) => {
+            //  moment(Date_Event).format("YYYY-MM-DD")    --- C'est la supposée date
+            console.log(Titre)
+                return { titre: Titre, date: moment(Date_event).format("YYYY-MM-DD") }
+            })
+            
+
+            setEvents(evsJson);
+      
         });
     };
 
+    useEffect(() => {
+        chargerEvenements();
+    }, []);
+
+
     const ajouterEvenement = () => {
         const title = prompt("Nom de l'événement:");
-        const date = prompt("Date de l'événement (DD/MM/YYYY):");
+        const date = prompt("Date de l'événement (YYYY-MM-DD):");
         axios.post('http://localhost:8081/addEvents', { title, date }).then(response => {
-            setEvents([...events, response.data]);
+            console.log(response)
         });
     };
 
