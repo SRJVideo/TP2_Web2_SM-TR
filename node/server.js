@@ -179,7 +179,7 @@ app.get('/events', (req, res) => {
 app.post('/addEvents', (req, res) => {
 
 
-    const query = "INSERT INTO evenements (Titre, Date_event) VALUES ('" + req.query.titre + "', STR_TO_DATE('" + req.query.date + "', '%d/%m/%Y'))";
+    const query = "INSERT INTO evenements (Titre, Date_event) VALUES ('" + req.body.title + "', STR_TO_DATE('" + req.body.date + "', '%d/%m/%Y'))";
     conn.query(query, (err, result) => {
         if (err) {
             console.error('Erreur lors de l\'ajout de lévénement : ' + err);

@@ -9,7 +9,7 @@ function DemoApp() {
     const [events, setEvents] = useState([]);
 
     const chargerEvenements = () => {
-        axios.get('/api/evenements').then(response => {
+        axios.get('http://localhost:8081/events').then(response => {
             setEvents(response.data);
         });
     };
@@ -17,7 +17,7 @@ function DemoApp() {
     const ajouterEvenement = () => {
         const title = prompt("Nom de l'événement:");
         const date = prompt("Date de l'événement (DD/MM/YYYY):");
-        axios.post('/api/evenements', { title, date }).then(response => {
+        axios.post('http://localhost:8081/addEvents', { title, date }).then(response => {
             setEvents([...events, response.data]);
         });
     };
@@ -25,7 +25,7 @@ function DemoApp() {
     const supprimerEvenement = (event) => {
         const confirmed = window.confirm(`Supprimer l'événement "${event.title}" ?`);
         if (confirmed) {
-            axios.delete(`/api/evenements/${event.id}`).then(() => {
+            axios.delete('http://localhost:8081/deleteEvents/:id/${event.id}').then(() => {
                 const newEvents = events.filter(e => e.id !== event.id);
                 setEvents(newEvents);
             });
