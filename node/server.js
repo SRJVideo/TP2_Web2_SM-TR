@@ -176,7 +176,7 @@ app.get('/events', (req, res) => {
 });
 
 //  POST pour ajouter un nouvel événement
-app.post('/addEvents', (req, res) => {
+app.post('/addEvent', (req, res) => {
 
 
     const query = "INSERT INTO evenements (Titre, Date_event) VALUES ('" + req.body.title + "', STR_TO_DATE('" + req.body.date + "', '%Y-%m-%d'))";
@@ -192,17 +192,17 @@ app.post('/addEvents', (req, res) => {
 });
 
 //  DELETE pour supprimer un événement par son ID
-app.delete('/deleteEvents/:id', (req, res) => {
-    const eventId = req.params.id;
-
-    const query = 'DELETE FROM evenements WHERE id = ?';
-    conn.query(query, [eventId], (err, result) => {
+app.delete('/deleteEvent/', (req, res) => {
+    const eventDel = req.query;
+  
+     const query = "DELETE FROM evenements WHERE Titre = ? AND Date_event = ?";
+    conn.query(query, [eventDel.titre, eventDel.date], (err, result) => {
         if (err) {
             console.error('Erreur lors de la suppression de l\'événement : ' + err);
             res.status(500).json({error: 'Erreur lors de la suppression de l\'événement'});
             return;
         }
-        res.status(204).send();
+         res.status(204).send("Suppression de l'évenement réussie");
     });
 });
 

@@ -13,14 +13,9 @@ function DemoApp() {
         axios.get('http://localhost:8081/events').then(response => {
 
             let evsJson = response.data.map(({ Titre, Date_event }) => {
-            //  moment(Date_Event).format("YYYY-MM-DD")    --- C'est la supposée date
-            console.log(Titre.value)
-                return {title: Titre, date: moment(Date_event).format("YYYY-MM-DD") }
+                return { title: Titre, date: moment(Date_event).format("YYYY-MM-DD") }
             })
-            
-
             setEvents(evsJson);
-      
         });
     };
 
@@ -32,17 +27,26 @@ function DemoApp() {
     const ajouterEvenement = () => {
         const title = prompt("Nom de l'événement:");
         const date = prompt("Date de l'événement (YYYY-MM-DD):");
-        axios.post('http://localhost:8081/addEvents', { title, date }).then(response => {
-            console.log(response)
-        });
+        if (title != null && date != null) {
+            axios.post('http://localhost:8081/addEvent', { title, date }).then(response => {
+                console.log(response)
+                chargerEvenements();
+            });
+        }
     };
 
     const supprimerEvenement = (event) => {
-        const confirmed = window.confirm(`Supprimer l'événement "${event.title}" ?`);
+        const [evTitre, evDate] = [event.title, event._instance.range.end];
+        const confirmed = window.confirm(`Supprimer l'événement "${evTitre}" ?`);
         if (confirmed) {
-            axios.delete('http://localhost:8081/deleteEvents/:id/${event.id}').then(() => {
-                const newEvents = events.filter(e => e.id !== event.id);
-                setEvents(newEvents);
+            axios.delete('http://localhost:8081/deleteEvent/', {
+                params: {
+                    titre: evTitre,
+                    date: moment(evDate).format("YYYY-MM-DD")
+                }
+            }).then((response) => {
+                console.log(response);
+                chargerEvenements();
             });
         }
     };
@@ -50,19 +54,13 @@ function DemoApp() {
     return (
         <div>
             <h1 className='MyCalendar' style={{ textAlign: "left" }}>Calendrier</h1>
-            <button onClick={chargerEvenements}>Charger les événements</button>
             <button onClick={ajouterEvenement}>Ajouter un événement</button>
-            <button onClick={supprimerEvenement}>supprimer un événement</button>
 
             <FullCalendar
                 plugins={[dayGridPlugin]}
                 initialView="dayGridMonth"
                 weekends={true}
                 events={events}
-                // events={[
-                //     { title: "Début TP1", date: '2023-09-12' },
-                //     { title: "Remise TP1", date: '2023-09-26' }
-                //   ]}
                 eventClick={(info) => supprimerEvenement(info.event)}
                 locale={frLocale}
             />
