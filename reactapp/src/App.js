@@ -35,7 +35,7 @@ function App() {
                             <Route exact path="/inscrire" element={<Inscrire/>}/>
                             <Route exact path="/connecter" element={<Connecter/>}/>
                             <Route exact path="/" element={<Accueil/>}/>
-                            <Route path="/calendrier" element={<Calendrier/>}/>
+                            <Route path="/calendrier" element={<Calendrier  user={loggedUser}/>}/>
                         </Routes>
                     </Container>
                 </BrowserRouter>

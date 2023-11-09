@@ -41,41 +41,41 @@ conn.connect(err => {
     if (err) throw err;
     console.log("Connexion à la base de données tp2 !");
 
-    //DROP TABLE IF EXISTS
-    sql = "DROP TABLE IF EXISTS evenements";
-    conn.query(sql, (err, result) => {
-        if (err) throw err;
-        console.log("Table Evenements détruite ❌");
-    })
+    // //DROP TABLE IF EXISTS
+    // sql = "DROP TABLE IF EXISTS evenements";
+    // conn.query(sql, (err, result) => {
+    //     if (err) throw err;
+    //     console.log("Table Evenements détruite ❌");
+    // })
 
-    sql = "DROP TABLE IF EXISTS utilisateurs";
-    conn.query(sql, (err, result) => {
-        if (err) throw err;
-        console.log("Table Utilisateurs détruite ❌");
-    })
+    // sql = "DROP TABLE IF EXISTS utilisateurs";
+    // conn.query(sql, (err, result) => {
+    //     if (err) throw err;
+    //     console.log("Table Utilisateurs détruite ❌");
+    // })
 
-    //CREATE TABLE
-    sql = "CREATE TABLE utilisateurs" +
-        " (Id INT not null AUTO_INCREMENT, " +
-        " Full_Name VARCHAR(255), " +
-        " Mot_De_Passe VARCHAR(255), " +
-        " PRIMARY KEY (Id) )";
-    conn.query(sql, (err, result) => {
-        if (err) throw err;
-        console.log("Table Utilisateurs créée 👍");
-    })
+    // //CREATE TABLE
+    // sql = "CREATE TABLE utilisateurs" +
+    //     " (Id INT not null AUTO_INCREMENT, " +
+    //     " Full_Name VARCHAR(255), " +
+    //     " Mot_De_Passe VARCHAR(255), " +
+    //     " PRIMARY KEY (Id) )";
+    // conn.query(sql, (err, result) => {
+    //     if (err) throw err;
+    //     console.log("Table Utilisateurs créée 👍");
+    // })
 
-    sql = "CREATE TABLE evenements" +
-        " (Id INT not null AUTO_INCREMENT, " +
-        " Titre VARCHAR(255), " +
-        " Date_event DATE, " +
-        " Id_Utilisateur INT, " +
-        " PRIMARY KEY (Id), " +
-        " FOREIGN KEY (Id_Utilisateur) REFERENCES utilisateurs (Id) ON DELETE CASCADE)";
-    conn.query(sql, (err, result) => {
-        if (err) throw err;
-        console.log("Table Evenements créée 👍");
-    })
+    // sql = "CREATE TABLE evenements" +
+    //     " (Id INT not null AUTO_INCREMENT, " +
+    //     " Titre VARCHAR(255), " +
+    //     " Date_event DATE, " +
+    //     " Id_Utilisateur INT, " +
+    //     " PRIMARY KEY (Id), " +
+    //     " FOREIGN KEY (Id_Utilisateur) REFERENCES utilisateurs (Id) ON DELETE CASCADE)";
+    // conn.query(sql, (err, result) => {
+    //     if (err) throw err;
+    //     console.log("Table Evenements créée 👍");
+    // })
 });
 /********************** utilisateurs ************************************/
 // POST un nouvel utilisateur
@@ -163,7 +163,7 @@ app.post('/login', express.urlencoded({extended: false}), (req, res) => {
 //  GET pour obtenir tous les événements
 app.get('/events', (req, res) => {
 
-    const query = 'SELECT * FROM evenements';
+    const query = 'SELECT * FROM evenements JOIN utilisateurs ON utilisateurs.Id = evenements.Id_Utilisateur';
     conn.query(query, (err, results) => {
         if (err) {
             console.error('Erreur lors de la récupération des événements : ' + err);
@@ -179,7 +179,7 @@ app.get('/events', (req, res) => {
 app.post('/addEvent', (req, res) => {
 
 
-    const query = "INSERT INTO evenements (Titre, Date_event) VALUES ('" + req.body.title + "', STR_TO_DATE('" + req.body.date + "', '%Y-%m-%d'))";
+    const query = "INSERT INTO evenements (Titre, Date_event, Id_Utilisateur) VALUES ('" + req.body.title + "', STR_TO_DATE('" + req.body.date + "', '%Y-%m-%d'), "+req.body.idUser+")";
     conn.query(query, (err, result) => {
         if (err) {
             console.error('Erreur lors de l\'ajout de lévénement : ' + err);
