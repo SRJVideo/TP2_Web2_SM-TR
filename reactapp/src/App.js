@@ -17,7 +17,7 @@ function App() {
     Axios.defaults.withCredentials = true;
 
     useEffect(() => {
-        Axios.get("https://samba-taha-node-tp2.onrender.com/login").then((response) => {
+        Axios.get("http://localhost:8081/login").then((response) => {
             setLoggedUser(response.data.estConnecte === true ? response.data.utilisateur : undefined);
             setLogNav(loggedUser!==undefined ? '/calendrier' : '/');
         })

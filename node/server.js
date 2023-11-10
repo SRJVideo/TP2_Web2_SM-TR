@@ -14,7 +14,7 @@ let conn = mysql.createConnection(connString);
 const app = express();
 app.use(express.json());
 app.use(cors({
-    origin: ["https://tp2-deploiement-react-sm-tr.vercel.app"],
+    origin: ["http://localhost:3000"],
     methods: ["GET", "POST", "DELETE"],
     credentials: true,
 }));
@@ -28,7 +28,7 @@ app.use(session({
     cookie: {expires: 1000 * 60 * 60 * 24},
 }));
 app.use((req, res, next) => {
-    res.setHeader("Access-Control-Allow-Origin", "https://tp2-deploiement-react-sm-tr.vercel.app");
+    res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
     res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     console.log("\nrequete recu !!!")
     next();
