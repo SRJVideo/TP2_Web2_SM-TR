@@ -12,7 +12,6 @@ function Navbar(props) {
         Axios.get("https://samba-taha-node-tp2.onrender.com/logout").then(response => console.log(response.data))
     }
 
-    // eslint-disable-next-line
     useEffect(() =>  nav(contextNav), [contextNav]);
 
 
