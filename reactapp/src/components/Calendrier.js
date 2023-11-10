@@ -25,15 +25,16 @@ function Calendrier(props) {
 
 
     const ajouterEvenement = () => {
-        const title = prompt("Nom de l'événement:");
-        const date = title!==null ? prompt("Date de l'événement (YYYY-MM-DD):",) : null;
-        if (new RegExp("[A-Za-z0-9\\s]+").test(title) &&  new RegExp("\\d{4}-\\d{2}-\\d{2}").test(date)) {
-            axios.post('https://samba-taha-node-tp2.onrender.com/addEvent', { title: title, date : date, idUser : props.user.Id }).then(response => {
+        const titleE = prompt("Nom de l'événement:");
+        const dateE = titleE!==null ? prompt("Date de l'événement (YYYY-MM-DD):",) : null;
+        if (new RegExp("[A-Za-z0-9\\s]+").test(titleE) &&  new RegExp("\\d{4}-\\d{2}-\\d{2}").test(dateE)) {
+            axios.post('https://samba-taha-node-tp2.onrender.com/addEvent', { title: titleE, date : dateE, idUser : props.user.Id }).then(response => {
                 console.log(response)
                 chargerEvenements();
             });
         }
     };
+
 
     const supprimerEvenement = (event) => {
         const [evTitre, evDate] = [event.title, event._instance.range.end];
