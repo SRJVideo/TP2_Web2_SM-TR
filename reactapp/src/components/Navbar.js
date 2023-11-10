@@ -1,25 +1,22 @@
-import {useEffect, useState} from 'react';
+import {useContext, useEffect} from 'react';
 import {NavLink, useNavigate} from 'react-router-dom';
 import {Button, Card} from "react-bootstrap";
 import Axios from "axios";
-
+import {ContextNav} from "../App"
+//https://www.youtube.com/watch?v=_HdrLsyAdJg
+//https://react.dev/reference/react/useContext#updating-data-passed-via-context
 function Navbar(props) {
+    const contextNav = useContext(ContextNav)
     const nav = useNavigate();
     Axios.defaults.withCredentials = true;
 
     const procederDeconnexion= () => {
         Axios.get("http://localhost:8081/logout").catch(er => console.log(er))
-        nav("/") 
     }
 
     useEffect(() => {
-        if(props.user !== undefined){
-            nav('/')
-        }
-        if(props.path === "/calendrier"){
-            nav('/calendrier')
-        }
-    }, []);
+        nav(contextNav)
+    }, [contextNav]);
 
 
     return (

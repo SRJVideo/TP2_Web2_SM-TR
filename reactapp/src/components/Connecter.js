@@ -1,7 +1,7 @@
 import {useState} from 'react';
 import Form from "react-bootstrap/Form";
 import {Button} from "react-bootstrap";
-import {NavLink, useNavigate} from "react-router-dom";
+import {NavLink} from "react-router-dom";
 import Axios from "axios";
 
 function Connecter() {
@@ -9,7 +9,7 @@ function Connecter() {
         username: '',
         password: ''
     })
-    const nav = useNavigate();
+
     const handleChange = (e) => {
         setValues({...values, [e.target.name]: e.target.value})
     }
