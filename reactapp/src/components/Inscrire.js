@@ -1,29 +1,42 @@
 import {NavLink} from "react-router-dom";
 import Form from "react-bootstrap/Form";
 import {Button, Col} from "react-bootstrap";
-import * as formik from "formik";
-import * as yup from "yup";
+import {useState} from "react";
 
 function Inscrire() {
     // https://react-bootstrap.github.io/docs/forms/validation/
-    const {Formik} = formik;
+    const [values, setValues] = useState({
+        username: '',
+        password: '',
+        message: 'Créer un nouvel utilisateur',
+        etat: false
+    })
+    const [invalidUser, invalidPass] = [ values.username.length <1, values.password.length <4]
 
-    const schema = yup.object().shape({
-        username: yup.string().required(),
-        password: yup.string().required(),
-    });
 
-    const procederInscription = (formik) => {
-        console.log(formik.username)
-        console.log(formik.password)
+    const handleChange = (e) => {
+        setValues({...values, [e.target.name]: e.target.value,
+            message: 'Créer un nouvel utilisateur',
+            etat: false})
 
-        fetch("http://localhost:8081/addUser", {
-            method: 'POST',
-            headers: {'Content-type': 'application/json'},
-            body: JSON.stringify({nom: formik.username, motdepasse: formik.password})
-        }).then(res => res.json())
-            .then(succ => console.log(succ))
-            .catch(error => console.log(error));
+    }
+
+    const handleSubmit = (event) => {
+        event.preventDefault();
+
+        if (new RegExp("\\w+\\s?").test(values.username) && new RegExp("\\w{4,}").test(values.password)) {
+            // samba-taha-node-tp2.onrender.com
+            fetch("http://localhost:8081/addUser", {
+                method: 'POST',
+                headers: {'Content-type': 'application/json'},
+                body: JSON.stringify({nom: values.username, motdepasse: values.password})
+            }).then(res => res.json())
+                .then(succ => {
+                    console.log(succ);
+                    setValues({...values, message: "L'ajout a bien été rétablit!", etat: true})
+                })
+                .catch(error => console.log(error));
+        }
 
     };
 
@@ -31,18 +44,10 @@ function Inscrire() {
     return (
         <div>
             <h1>S'inscrire</h1>
-            <p>Créer un nouvel utilisateur</p>
+            <p style={values.etat ?{ color:"forestgreen", fontStyle:"oblique"}:{ color:"black"}}>
+                {values.message}
+            </p>
 
-
-            <Formik
-                validationSchema={schema}
-                onSubmit={procederInscription}
-                initialValues={{
-                    username: '',
-                    password: '',
-                }}
-            >
-                {({handleSubmit, handleChange, values, touched, errors}) => (
                     <Form noValidate onSubmit={handleSubmit}>
                         <Form.Group as={Col} className="mb-3" >
                             <Form.Label htmlFor="username">Nom d'utilisateur</Form.Label>
@@ -50,8 +55,11 @@ function Inscrire() {
                                           type="text"
                                           value={values.username}
                                           onChange={handleChange}
-                                          isValid={touched.username && !errors.username}
+                                          min={1}
+                                          isValid={!invalidUser}
+                                          isInvalid={!!invalidUser}
                                           required></Form.Control>
+                            <Form.Control.Feedback type="invalid">Au moins un caractère alphanumériques avec ou sans espace de valide</Form.Control.Feedback>
                         </Form.Group>
 
                         <Form.Group className="mb-3" >
@@ -60,9 +68,10 @@ function Inscrire() {
                                           type="password"
                                           value={values.password}
                                           onChange={handleChange}
-                                          isValid={values.password.length >= 4 && touched.password && !errors.password}
-                                          isInvalid={values.password.length < 4}
+                                          isValid={!invalidPass}
+                                          isInvalid={!!invalidPass}
                                           required></Form.Control>
+                            <Form.Control.Feedback type="invalid">Au moins 4 caractères alphanumériques ou underscore de valide</Form.Control.Feedback>
                         </Form.Group>
 
                         <Form.Group className="mb-3">
@@ -73,14 +82,10 @@ function Inscrire() {
                             </Form.Text>
                         </Form.Group>
 
-                        <Button variant="primary" type="submit">
+                        <Button variant="primary" type="submit" disabled={invalidPass || invalidUser}>
                             Continuer
                         </Button>
                     </Form>
-                )}
-            </Formik>
-
-
         </div>
     );
 }

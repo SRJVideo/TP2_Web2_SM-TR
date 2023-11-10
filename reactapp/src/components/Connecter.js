@@ -18,12 +18,14 @@ function Connecter() {
     const handleSubmit = (event) => {
         event.preventDefault();
 
-        // samba-taha-node-tp2.onrender.com
-    Axios.post("http://localhost:8081/login", {nom: values.username,  motdepasse: values.password,})
-            .then((response) => {
-                response.data.msg  ? console.log( response.data.msg ) : console.log( response.data);
-                if(!response.data.msg) window.location.reload();
-            })
+        if (new RegExp("^.+").test(values.username) && new RegExp("\\w{4,}").test(values.password)) {
+            // samba-taha-node-tp2.onrender.com
+            Axios.post("http://localhost:8081/login", {nom: values.username, motdepasse: values.password,})
+                .then((response) => {
+                    response.data.msg ? console.log(response.data.msg) : console.log(response.data);
+                    if (!response.data.msg) window.location.reload();
+                })
+        }
     };
 
 
@@ -45,7 +47,7 @@ function Connecter() {
                     <Form.Control name="password"
                                   type="password"
                                   onChange={handleChange}
-                                  isValid={values.password > 4}
+                                  isValid={values.password.length > 4}
                                   required></Form.Control>
                 </Form.Group>
                 <Form.Group className="mb-3">
@@ -56,7 +58,6 @@ function Connecter() {
                 <Button variant="primary" type="submit">
                     Continuer
                 </Button>
-
             </Form>
         </div>
     );
