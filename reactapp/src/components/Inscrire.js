@@ -2,6 +2,7 @@ import {NavLink} from "react-router-dom";
 import Form from "react-bootstrap/Form";
 import {Button, Col} from "react-bootstrap";
 import {useState} from "react";
+import Axios from "axios";
 
 function Inscrire() {
     // https://react-bootstrap.github.io/docs/forms/validation/
@@ -18,26 +19,19 @@ function Inscrire() {
         setValues({...values, [e.target.name]: e.target.value,
             message: 'Créer un nouvel utilisateur',
             etat: false})
-
     }
-
+    Axios.defaults.withCredentials = true;
     const handleSubmit = (event) => {
         event.preventDefault();
 
         if (new RegExp("\\w+\\s?").test(values.username) && new RegExp("\\w{4,}").test(values.password)) {
             // samba-taha-node-tp2.onrender.com
-            fetch("http://localhost:8081/addUser", {
-                method: 'POST',
-                headers: {'Content-type': 'application/json'},
-                body: JSON.stringify({nom: values.username, motdepasse: values.password})
-            }).then(res => res.json())
-                .then(succ => {
-                    console.log(succ);
+            Axios.post("http://localhost:8081/addUser", {nom: values.username, motdepasse: values.password})
+                .then((response) => {
+                    console.log(response.data);
                     setValues({...values, message: "L'ajout a bien été rétablit!", etat: true})
-                })
-                .catch(error => console.log(error));
+                }).catch(error => console.log(error));
         }
-
     };
 
 
@@ -55,7 +49,6 @@ function Inscrire() {
                                           type="text"
                                           value={values.username}
                                           onChange={handleChange}
-                                          min={1}
                                           isValid={!invalidUser}
                                           isInvalid={!!invalidUser}
                                           required></Form.Control>

@@ -11,13 +11,12 @@ import {createContext, useEffect, useState} from "react";
 import Axios from "axios";
 export const  ContextNav = createContext("/")
 
-//deploiement : https://tp2-deploiement-react-sm-tr.vercel.app/
+//deploiement : https://tp2-deploiement-react-sm-tr.vercel.app
 function App() {
     const [logNav, setLogNav] = useState("/");
     const [loggedUser, setLoggedUser] = useState(undefined)
     Axios.defaults.withCredentials = true;
     useEffect(() => {
-        // NE PAS OUBLIER DE CHANGER LA FIN DU TP !!!  URL deploy node == https://samba-taha-node-tp2.onrender.com
         Axios.get("http://localhost:8081/login").then((response) => {
             setLoggedUser(response.data.estConnecte === true ? response.data.utilisateur : undefined);
             setLogNav(loggedUser!==undefined ? '/calendrier' : '/');

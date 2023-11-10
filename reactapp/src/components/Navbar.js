@@ -11,7 +11,7 @@ function Navbar(props) {
     Axios.defaults.withCredentials = true;
 
     const procederDeconnexion= () => {
-        Axios.get("http://localhost:8081/logout").catch(er => console.log(er))
+        Axios.get("http://localhost:8081/logout").then(response => console.log(response.data))
     }
     // eslint-disable-next-line
     useEffect(() =>  nav(contextNav), [contextNav]);
