@@ -13,22 +13,21 @@ export const  ContextNav = createContext("/")
 
 //deploiement : https://tp2-deploiement-react-sm-tr.vercel.app/
 function App() {
-    const [currpath, setCurrPath] = useState("/");
-    const [loggedUser, setLooggedUser] = useState(undefined)
+    const [logNav, setLogNav] = useState("/");
+    const [loggedUser, setLoggedUser] = useState(undefined)
     Axios.defaults.withCredentials = true;
     useEffect(() => {
         // NE PAS OUBLIER DE CHANGER LA FIN DU TP !!!  URL deploy node == https://samba-taha-node-tp2.onrender.com
         Axios.get("http://localhost:8081/login").then((response) => {
-            setLooggedUser(response.data.estConnecte === true ? response.data.utilisateur : undefined);
-            setCurrPath(loggedUser!==undefined ? '/calendrier' : '/');
+            setLoggedUser(response.data.estConnecte === true ? response.data.utilisateur : undefined);
+            setLogNav(loggedUser!==undefined ? '/calendrier' : '/');
         })
-     
     }, [loggedUser])
 
     return (
         <div className="App">
             <BrowserRouter>
-                <ContextNav.Provider value={currpath}>
+                <ContextNav.Provider value={logNav}>
                 <Navbar user={loggedUser}  />
                 </ContextNav.Provider>
                 <Container className='navBar'>

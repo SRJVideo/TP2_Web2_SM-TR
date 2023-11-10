@@ -22,7 +22,7 @@ function Connecter() {
     Axios.post("http://localhost:8081/login", {nom: values.username,  motdepasse: values.password,})
             .then((response) => {
                 response.data.msg  ? console.log( response.data.msg ) : console.log( response.data);
-                if(!response.data.msg) window.location.reload(true);
+                if(!response.data.msg) window.location.reload();
             })
     };
 

@@ -6,7 +6,7 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import frLocale from '@fullcalendar/core/locales/fr';
 
 
-function DemoApp(props) {
+function Calendrier(props) {
     const [events, setEvents] = useState([]);
 
     const chargerEvenements = () => {
@@ -26,8 +26,8 @@ function DemoApp(props) {
 
     const ajouterEvenement = () => {
         const title = prompt("Nom de l'événement:");
-        const date = prompt("Date de l'événement (YYYY-MM-DD):");
-        if (title != null && date != null) {
+        const date = title!==null ? prompt("Date de l'événement (YYYY-MM-DD):",) : null;
+        if (new RegExp("[A-Za-z0-9\\s]+").test(title) &&  new RegExp("\\d{4}-\\d{2}-\\d{2}").test(date)) {
             axios.post('http://localhost:8081/addEvent', { title: title, date : date, idUser : props.user.Id }).then(response => {
                 console.log(response)
                 chargerEvenements();
@@ -68,4 +68,4 @@ function DemoApp(props) {
     );
 }
 
-export default DemoApp;
+export default Calendrier;

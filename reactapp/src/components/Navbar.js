@@ -13,14 +13,12 @@ function Navbar(props) {
     const procederDeconnexion= () => {
         Axios.get("http://localhost:8081/logout").catch(er => console.log(er))
     }
-
-    useEffect(() => {
-        nav(contextNav)
-    }, [contextNav]);
+    // eslint-disable-next-line
+    useEffect(() =>  nav(contextNav), [contextNav]);
 
 
     return (
-        <nav className="navBar">
+        <nav className="navBar" >
             <ul>
                 <NavLink exact to="/">Accueil</NavLink>
                 {(props.user !== undefined) ?
