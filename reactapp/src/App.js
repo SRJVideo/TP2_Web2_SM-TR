@@ -16,6 +16,7 @@ function App() {
     const [logNav, setLogNav] = useState("/");
     const [loggedUser, setLoggedUser] = useState(undefined)
     Axios.defaults.withCredentials = true;
+
     useEffect(() => {
         Axios.get("https://samba-taha-node-tp2.onrender.com/login").then((response) => {
             setLoggedUser(response.data.estConnecte === true ? response.data.utilisateur : undefined);
