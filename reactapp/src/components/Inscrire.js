@@ -26,7 +26,7 @@ function Inscrire() {
 
         if (new RegExp("\\w+\\s?").test(values.username) && new RegExp("\\w{4,}").test(values.password)) {
             // samba-taha-node-tp2.onrender.com
-            Axios.post("http://localhost:8081/addUser", {nom: values.username, motdepasse: values.password})
+            Axios.post("https://samba-taha-node-tp2.onrender.com/addUser", {nom: values.username, motdepasse: values.password})
                 .then((response) => {
                     console.log(response.data);
                     setValues({...values, message: "L'ajout a bien été rétablit!", etat: true})
