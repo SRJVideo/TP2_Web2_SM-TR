@@ -5,7 +5,6 @@ import {useState} from "react";
 import Axios from "axios";
 
 function Inscrire() {
-    // https://react-bootstrap.github.io/docs/forms/validation/
     const [values, setValues] = useState({
         username: '',
         password: '',

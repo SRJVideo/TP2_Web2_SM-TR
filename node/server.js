@@ -23,7 +23,6 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(session({
     key: "userID",                              //nom du cookie que l'on crée
     secret: "secret du groupe !",
-    // https://stackoverflow.com/questions/40381401/when-to-use-saveuninitialized-and-resave-in-express-session
     resave: false,                              // sauvegarde un objet cookie
     saveUninitialized: false,                   // sauvegarder une session [seulement quand il ya nouvelle modif (false)/ tout le temps (true)]
     cookie: {expires: 1000 * 60 * 60 * 24},
@@ -211,3 +210,5 @@ const server = app.listen(8081, function () {
     const port = server.address().port;
     console.log("TP2 Samba-Taha http://%s:%s", host, port)
 });
+
+//deploiement : https://samba-taha-node-tp2.onrender.com
