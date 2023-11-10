@@ -10,7 +10,7 @@ function Calendrier(props) {
     const [events, setEvents] = useState([]);
 
     const chargerEvenements = () => {
-        axios.get('http://localhost:8081/events').then(response => {
+        axios.get('https://samba-taha-node-tp2.onrender.com/events').then(response => {
 
             let evsJson = response.data.map(({ Titre, Date_event }) => {
                 return { title: Titre, date: moment(Date_event).format("YYYY-MM-DD") }
@@ -28,7 +28,7 @@ function Calendrier(props) {
         const title = prompt("Nom de l'événement:");
         const date = title!==null ? prompt("Date de l'événement (YYYY-MM-DD):",) : null;
         if (new RegExp("[A-Za-z0-9\\s]+").test(title) &&  new RegExp("\\d{4}-\\d{2}-\\d{2}").test(date)) {
-            axios.post('http://localhost:8081/addEvent', { title: title, date : date, idUser : props.user.Id }).then(response => {
+            axios.post('https://samba-taha-node-tp2.onrender.com/addEvent', { title: title, date : date, idUser : props.user.Id }).then(response => {
                 console.log(response)
                 chargerEvenements();
             });
@@ -39,7 +39,7 @@ function Calendrier(props) {
         const [evTitre, evDate] = [event.title, event._instance.range.end];
         const confirmed = window.confirm(`Supprimer l'événement "${evTitre}" ?`);
         if (confirmed) {
-            axios.delete('http://localhost:8081/deleteEvent/', {
+            axios.delete('https://samba-taha-node-tp2.onrender.com/deleteEvent/', {
                 params: {
                     titre: evTitre,
                     date: moment(evDate).format("YYYY-MM-DD")

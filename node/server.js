@@ -14,7 +14,7 @@ let conn = mysql.createConnection(connString);
 const app = express();
 app.use(express.json());
 app.use(cors({
-    origin: ["http://localhost:3000"],
+    origin: ["https://tp2-deploiement-react-sm-tr.vercel.app"],
     methods: ["GET", "POST", "DELETE"],
     credentials: true,
 }));
@@ -23,13 +23,12 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(session({
     key: "userID",                              //nom du cookie que l'on crée
     secret: "secret du groupe !",
-    // https://stackoverflow.com/questions/40381401/when-to-use-saveuninitialized-and-resave-in-express-session
     resave: false,                              // sauvegarde un objet cookie
     saveUninitialized: false,                   // sauvegarder une session [seulement quand il ya nouvelle modif (false)/ tout le temps (true)]
     cookie: {expires: 1000 * 60 * 60 * 24},
 }));
 app.use((req, res, next) => {
-    res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
+    res.setHeader("Access-Control-Allow-Origin", "https://tp2-deploiement-react-sm-tr.vercel.app");
     res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     console.log("\nrequete recu !!!")
     next();
@@ -211,3 +210,5 @@ const server = app.listen(8081, function () {
     const port = server.address().port;
     console.log("TP2 Samba-Taha http://%s:%s", host, port)
 });
+
+//deploiement : https://samba-taha-node-tp2.onrender.com

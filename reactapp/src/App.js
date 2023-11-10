@@ -7,17 +7,17 @@ import Connecter from "./components/Connecter";
 import Calendrier from "./components/Calendrier";
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap/dist/js/bootstrap.js';
-import {createContext, useEffect, useState} from "react";
+import {useEffect, useState} from "react";
 import Axios from "axios";
-export const  ContextNav = createContext("/")
 
 //deploiement : https://tp2-deploiement-react-sm-tr.vercel.app
 function App() {
-    const [logNav, setLogNav] = useState("/");
+    const [logNav, setLogNav] = useState("");
     const [loggedUser, setLoggedUser] = useState(undefined)
     Axios.defaults.withCredentials = true;
+
     useEffect(() => {
-        Axios.get("http://localhost:8081/login").then((response) => {
+        Axios.get("https://samba-taha-node-tp2.onrender.com/login").then((response) => {
             setLoggedUser(response.data.estConnecte === true ? response.data.utilisateur : undefined);
             setLogNav(loggedUser!==undefined ? '/calendrier' : '/');
         })
@@ -26,9 +26,9 @@ function App() {
     return (
         <div className="App">
             <BrowserRouter>
-                <ContextNav.Provider value={logNav}>
-                <Navbar user={loggedUser}  />
-                </ContextNav.Provider>
+
+                <Navbar user={loggedUser} nav={logNav} />
+
                 <Container className='navBar'>
                     <Routes>
                         <Route exact path="/inscrire" element={<Inscrire />} />

@@ -2,16 +2,14 @@ import {useContext, useEffect} from 'react';
 import {NavLink, useNavigate} from 'react-router-dom';
 import {Button, Card} from "react-bootstrap";
 import Axios from "axios";
-import {ContextNav} from "../App"
-//https://www.youtube.com/watch?v=_HdrLsyAdJg
-//https://react.dev/reference/react/useContext#updating-data-passed-via-context
+
 function Navbar(props) {
-    const contextNav = useContext(ContextNav)
-    const nav = useNavigate();
     Axios.defaults.withCredentials = true;
+    const nav = useNavigate();
+    const contextNav = props.nav
 
     const procederDeconnexion= () => {
-        Axios.get("http://localhost:8081/logout").then(response => console.log(response.data))
+        Axios.get("https://samba-taha-node-tp2.onrender.com/logout").then(response => console.log(response.data))
     }
     // eslint-disable-next-line
     useEffect(() =>  nav(contextNav), [contextNav]);
